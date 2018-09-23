@@ -45,4 +45,16 @@ jobs:
               docker build -t guboss1509/testexpressnodejs:${CIRCLE_SHA1} .
               docker push guboss1509/testexpressnodejs:latest
               docker push guboss1509/testexpressnodejs:${CIRCLE_SHA1}
+      - run: 
+          name: "Call to rancher to deploy"
+          command: |
+              docker run --rm -it \
+                -e CATTLE_ACCESS_KEY="$CATTLE_ACCESS_KEY" \
+                -e CATTLE_SECRET_KEY="$CATTLE_SECRET_KEY" \
+                -e CATTLE_URL="$CATTLE_URL" \
+                etlweather/gaucho upgrade $RANCHER_EXAMPLE_NODEJS \
+                --imageUuid 'docker:guboss1509/testexpressnodejs:latest' \
+                --batch_size 1 --start_first \
+                --auto_complete --timeout 600 \
+                /
       - run: echo Done!
